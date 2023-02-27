@@ -1,0 +1,48 @@
+﻿@model Proyecto.Models.Card
+
+@{
+    ViewData["Title"] = "CardCreate";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+
+}
+
+<h1>CardCreate</h1>
+
+<h4>Card</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CardCreate">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Cardtype" class="control-label"></label>
+                <input asp-for="Cardtype" class="form-control" />
+                <span asp-validation-for="Cardtype" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Number" class="control-label"></label>
+                <input asp-for="Number" class="form-control" />
+                <span asp-validation-for="Number" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpMonth" class="control-label"></label>
+                <input asp-for="ExpMonth" class="form-control" />
+                <span asp-validation-for="ExpMonth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpYear" class="control-label"></label>
+                <input asp-for="ExpYear" class="form-control" />
+                <span asp-validation-for="ExpYear" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+

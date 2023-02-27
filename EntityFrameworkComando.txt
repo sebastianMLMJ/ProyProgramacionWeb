@@ -1,0 +1,2 @@
+Scaffold-DbContext "server=127.0.0.1;userid=root;password=root123;database=store;TreatTinyAsBoolean=False" MySql.EntityFrameworkCore -OutputDir Models -f
+

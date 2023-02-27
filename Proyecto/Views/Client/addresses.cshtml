@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Proyecto.ViewModels.ContactInfo>
+
+@{
+    ViewData["Title"] = "addresses";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<h1>Contacts</h1>
+
+<p>
+    <a asp-action="addressesCreate">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Contact.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contact.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contact.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contact.HomeAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Municipio.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Departamento.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Contact.FirstName)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Contact.LastName)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Contact.PhoneNumber)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Contact.HomeAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Municipio.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Departamento.Name)
+            </td>
+            <td>
+                <a asp-action="addressesEdit" asp-route-id="@item.Contact.IdContact">Edit</a> |
+                <a asp-action="addressesDelete" asp-route-id="@item.Contact.IdContact">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

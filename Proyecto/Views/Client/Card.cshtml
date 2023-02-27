@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Proyecto.Models.Card>
+
+@{
+    ViewData["Title"] = "Card";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+
+}
+
+<h1>Card</h1>
+
+<p>
+    <a asp-action="CardCreate">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Cardtype)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Number)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExpMonth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExpYear)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cardtype)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpMonth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpYear)
+            </td>
+            <td>
+                <a asp-action="CardUpdate" asp-route-id="@item.IdCard">Edit</a> |
+                <a asp-action="CardDelete" asp-route-id="@item.IdCard">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
