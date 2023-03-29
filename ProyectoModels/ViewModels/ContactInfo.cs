@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using ProyectoModels.Models;
 
-namespace Proyecto.ViewModels
+namespace ProyectoModels.ViewModels
 {
     public class ContactInfo
     {

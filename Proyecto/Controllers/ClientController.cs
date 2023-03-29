@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Proyecto.Models;
-using Proyecto.ViewModels;
+using ProyectoModels.Models;
+using ProyectoModels.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 
@@ -9,241 +9,197 @@ namespace Proyecto.Controllers
 {
     public class ClientController : Controller
     {
+        public string url = ApiUrl.url;
+
         public IActionResult ClientHome()
         {
             return View();
         }
         //direcciones
+        
         #region
-        public IActionResult addresses()
+        public async Task<IActionResult> addresses()
         {
-            int iduser = Convert.ToInt32(HttpContext.Session.GetString("iduser"));
-
-            List<ContactInfo> list;
-            //List<Contact> list;
-            using (var context = new StoreContext())
+            string? iduser = HttpContext.Session.GetString("iduser");
+            IEnumerable<Contact> list;
+            try
             {
-                list =
-                (from c in context.Contacts
-                 join m in context.Municipios on c.IdMunicipio equals m.IdMunicipio
-                 join d in context.Departamentos on m.IdDepartamento equals d.IdDepartamento
-                 select new ContactInfo
-                 {
-                     Contact = c,
-                     Municipio = m,
-                     Departamento = d
-                 }).ToList();
-
+                HttpClient client = new HttpClient();
+                list = await client.GetFromJsonAsync<IEnumerable<Contact>>(url + "api/Contacts?id=" + iduser);
             }
-
+            catch (Exception)
+            {
+                return BadRequest();
+               
+            }
+           
             return View(list);
         }
 
-        public IActionResult addressesCreate()
+
+        public async Task<IActionResult> addressesCreate()
         {
-            ContactInfo contactInfo = new ContactInfo();
-            List<Municipio> municipios = new List<Municipio>();
-            using (var context = new StoreContext())
-            {
-                municipios =
-               (from d in context.Municipios
-                select new Municipio
-                { Name = d.Name,
-                    IdMunicipio = d.IdMunicipio }).ToList();
-            }
-
-            contactInfo.municipios = municipios.ConvertAll(d => {
-
-                return new SelectListItem
-                {
-                    Text = d.Name,
-                    Value = d.IdMunicipio.ToString(),
-                    Selected = false
-                };
-            });
-
+            HttpClient client = new HttpClient();
+            var contactInfo = await client.GetFromJsonAsync<ContactInfo>(url + "api/Contacts/Municipios");
             return View(contactInfo);
         }
 
         [HttpPost]
-        public IActionResult addressesCreate(ContactInfo newcontact, string municipios)
+        public async Task<IActionResult> addressesCreate(ContactInfo newcontact, string municipios)
         {
-            newcontact.Contact.IdUser = Convert.ToInt32(HttpContext.Session.GetString("iduser"));
-            newcontact.Contact.IdMunicipio = Convert.ToInt32(municipios);
-            using (var context = new StoreContext())
-            {
-                context.Contacts.Add(newcontact.Contact);
-                context.SaveChanges();
-            }
 
+            try
+            {
+                newcontact.Contact.IdUser = Convert.ToInt32(HttpContext.Session.GetString("iduser"));
+                newcontact.Contact.IdMunicipio = Convert.ToInt32(municipios);
+                HttpClient client = new HttpClient();
+                var response = await client.PostAsJsonAsync(url + "api/Contacts", newcontact.Contact);
+
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
             return RedirectToAction("addresses");
 
         }
 
-        public IActionResult addressesEdit(int id)
+        public async Task<IActionResult> addressesEdit(int id)
         {
-            ContactInfo contactInfo = new ContactInfo();
-            List<Municipio> municipios = new List<Municipio>();
 
-            using (var context = new StoreContext())
-            {
-                contactInfo.Contact = context.Contacts.Where(x => x.IdContact == id).FirstOrDefault();
-                municipios =
-                    (from d in context.Municipios
-                     select new Municipio
-                     {
-                         Name = d.Name,
-                         IdMunicipio = d.IdMunicipio
-                     }).ToList();
-            }
-
-            contactInfo.municipios = municipios.ConvertAll(d => {
-
-                return new SelectListItem
-                {
-                    Text = d.Name,
-                    Value = d.IdMunicipio.ToString(),
-                    Selected = true,
-
-                };
-
-            });
-
-            foreach (var item in contactInfo.municipios)
-            {
-                if (item.Value == contactInfo.Contact.IdMunicipio.ToString())
-                {
-                    item.Selected = true;
-                }
-                else
-                {
-                    item.Selected = false;
-                }
-            }
-
-
+            HttpClient client = new HttpClient();
+            ContactInfo? contactInfo = await client.GetFromJsonAsync<ContactInfo>(url + "api/Contacts/MunicipiosEdit?id=" + id.ToString());
             return View(contactInfo);
         }
 
         [HttpPost]
-        public IActionResult addressesEdit(ContactInfo contactInfo, string municipios)
+        public async Task <IActionResult> addressesEdit(ContactInfo contactInfo, string municipios)
         {
             contactInfo.Contact.IdMunicipio = Convert.ToInt32(municipios);
 
-            using (var context = new StoreContext())
-            {
-                context.Contacts.Update(contactInfo.Contact);
-                context.SaveChanges();
+            HttpClient client = new HttpClient();
 
-            }
+            var response = await client.PutAsJsonAsync(url + "api/Contacts/"+contactInfo.Contact.IdContact.ToString(), contactInfo.Contact);
             return RedirectToAction("addresses");
         }
 
-        public IActionResult addressesDelete(int id)
+        public async Task <IActionResult> addressesDelete(int id)
         {
             ContactInfo contactInfo = new ContactInfo();
 
-            using (var context = new StoreContext())
-            {
-                contactInfo.Contact = context.Contacts.Where(x => x.IdContact == id).FirstOrDefault();
-            }
+            HttpClient client = new HttpClient();
+            contactInfo.Contact = await client.GetFromJsonAsync<Contact>(url + "api/Contacts/"+ id.ToString());
 
             return View(contactInfo);
         }
 
         [HttpPost]
-        public IActionResult addressesDelete(ContactInfo contactInfo)
+        public async Task<IActionResult> addressesDelete(ContactInfo contactInfo)
         {
             Contact contact = contactInfo.Contact;
-            using (var context = new StoreContext())
-            {
-                context.Contacts.Remove(contact);
-                context.SaveChanges();
-            }
+            HttpClient client = new HttpClient();
+
+            await client.DeleteFromJsonAsync<Contact>(url + "api/Contacts/" + contactInfo.Contact.IdContact.ToString());
             return RedirectToAction("addresses");
         }
-#endregion
+        #endregion
 
-        public IActionResult Card()
+        #region 
+        public async Task<IActionResult> Card()
         {
-            List<Card> list = new List<Card>();
-            using(var context = new StoreContext())
-            {
-                list = (from c in context.Cards select new Card 
-                {
-                    IdUser = c.IdUser,
-                    IdCard= c.IdCard,
-                    Cardtype= c.Cardtype,
-                    Number= c.Number,
-                    ExpMonth= c.ExpMonth,
-                    ExpYear= c.ExpYear
-                
-                }).ToList();
-            }
-            return View(list);
+            HttpClient client = new HttpClient();
+
+            var lst = await client.GetFromJsonAsync<IEnumerable<Card>>(url + "api/Cards");
+            return View(lst);
         }
 
         public IActionResult CardCreate()
         {
-            
             return View();
         }
 
         [HttpPost]
-        public IActionResult CardCreate(Card card)
+        public async Task<IActionResult> CardCreate(Card card)
         {
+            HttpClient client = new HttpClient();
 
-            card.IdUser = Convert.ToInt32(HttpContext.Session.GetString("iduser"));
-            using (var context = new StoreContext())
+            try
             {
-                context.Cards.Add(card);
-                context.SaveChanges();
+                var response = await client.PostAsJsonAsync(url + "api/Cards", card);
             }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
 
             return RedirectToAction("Card");
         }
 
-        public IActionResult CardUpdate(int id) {
+        public async Task<IActionResult> CardUpdate(int id) {
 
-            Card card = new Card();
-            using(var context = new StoreContext()) {
-                card = context.Cards.Where(x => x.IdCard == id).FirstOrDefault();
+           
+            Card card;
+            HttpClient client = new HttpClient();
+            try
+            {
+                card = await client.GetFromJsonAsync<Card>(url + "api/Cards/" + id.ToString());
+
+            }
+            catch (Exception)
+            {
+                return BadRequest();
             }
             return View(card);
         }
 
         [HttpPost]
-        public IActionResult CardUpdate(Card card)
+        public async Task<IActionResult> CardUpdate(Card card)
         {
-            using(var context = new StoreContext())
+            HttpClient client = new HttpClient();
+
+            try
             {
-                context.Cards.Update(card);
-                context.SaveChanges();
+                var response = await client.PutAsJsonAsync(url + "api/Cards/" + card.IdCard.ToString(), card);
+
             }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
             return RedirectToAction("Card");
 
         }
 
-        public IActionResult CardDelete(int id)
+        public async Task<IActionResult> CardDelete(int id)
         {
-            Card card = new Card();
-            using (var context = new StoreContext())
+
+            Card card;
+            HttpClient client = new HttpClient();
+            try
             {
-                card = context.Cards.Where(x=> x.IdCard== id).FirstOrDefault();
+                card = await client.GetFromJsonAsync<Card>(url + "api/Cards/" + id.ToString());
+
             }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
 
             return View(card); 
         }
 
         [HttpPost]
-        public IActionResult CardDelete(Card card)
+        public async Task<IActionResult> CardDelete(Card card)
         {
-            using(var context = new StoreContext())
-            {
-                context.Cards.Remove(card);
-                context.SaveChanges();
-            }
+            HttpClient client= new HttpClient();
+            await client.DeleteFromJsonAsync<Card>(url +"api/Cards/" + card.IdCard.ToString());
+
             return RedirectToAction("Card");
         }
+        #endregion
     }
 }
