@@ -111,7 +111,7 @@ namespace ApiProyecto.Controllers
             _context.Departamentos.Remove(departamento);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(departamento);
         }
 
         private bool DepartamentoExists(int id)

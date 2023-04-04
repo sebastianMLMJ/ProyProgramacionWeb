@@ -4,6 +4,7 @@ using ProyectoModels.Models;
 using ProyectoModels.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
+using MySqlX.XDevAPI;
 
 namespace Proyecto.Controllers
 {
@@ -47,18 +48,19 @@ namespace Proyecto.Controllers
         [HttpPost]
         public async Task<IActionResult> addressesCreate(ContactInfo newcontact, string municipios)
         {
+            HttpClient client = new HttpClient();
 
-            try
+            if (ModelState.IsValid)
             {
                 newcontact.Contact.IdUser = Convert.ToInt32(HttpContext.Session.GetString("iduser"));
                 newcontact.Contact.IdMunicipio = Convert.ToInt32(municipios);
-                HttpClient client = new HttpClient();
                 var response = await client.PostAsJsonAsync(url + "api/Contacts", newcontact.Contact);
-
             }
-            catch (Exception)
+            else
             {
-                return BadRequest();
+                var list = await client.GetFromJsonAsync<ContactInfo>(url + "api/Contacts/Municipios");
+                newcontact.municipios = list.municipios;
+                return View(newcontact);
             }
             
             return RedirectToAction("addresses");
@@ -76,11 +78,21 @@ namespace Proyecto.Controllers
         [HttpPost]
         public async Task <IActionResult> addressesEdit(ContactInfo contactInfo, string municipios)
         {
-            contactInfo.Contact.IdMunicipio = Convert.ToInt32(municipios);
-
             HttpClient client = new HttpClient();
 
-            var response = await client.PutAsJsonAsync(url + "api/Contacts/"+contactInfo.Contact.IdContact.ToString(), contactInfo.Contact);
+            if (ModelState.IsValid)
+            {
+                contactInfo.Contact.IdMunicipio = Convert.ToInt32(municipios);
+                var response = await client.PutAsJsonAsync(url + "api/Contacts/" + contactInfo.Contact.IdContact.ToString(), contactInfo.Contact);
+
+            }
+            else
+            {
+                contactInfo = await client.GetFromJsonAsync<ContactInfo>(url + "api/Contacts/MunicipiosEdit?id=" + contactInfo.Contact.IdContact.ToString());
+                return View(contactInfo);
+            }
+            
+
             return RedirectToAction("addresses");
         }
 
@@ -108,29 +120,36 @@ namespace Proyecto.Controllers
         #region 
         public async Task<IActionResult> Card()
         {
+            string? iduser = HttpContext.Session.GetString("iduser");
+
             HttpClient client = new HttpClient();
 
-            var lst = await client.GetFromJsonAsync<IEnumerable<Card>>(url + "api/Cards");
+            var lst = await client.GetFromJsonAsync<IEnumerable<Card>>(url + "api/Cards?id="+ iduser);
             return View(lst);
         }
 
         public IActionResult CardCreate()
         {
-            return View();
+            string? iduser = HttpContext.Session.GetString("iduser");
+            Card card = new Card();
+            card.IdUser = Convert.ToInt32(iduser);
+            return View(card);
         }
 
         [HttpPost]
         public async Task<IActionResult> CardCreate(Card card)
         {
+
             HttpClient client = new HttpClient();
 
-            try
+            if (ModelState.IsValid)
             {
                 var response = await client.PostAsJsonAsync(url + "api/Cards", card);
+
             }
-            catch (Exception)
+            else
             {
-                return BadRequest();
+                return View(card);
             }
 
 
@@ -159,14 +178,14 @@ namespace Proyecto.Controllers
         {
             HttpClient client = new HttpClient();
 
-            try
+            if (ModelState.IsValid)
             {
                 var response = await client.PutAsJsonAsync(url + "api/Cards/" + card.IdCard.ToString(), card);
 
             }
-            catch (Exception)
+            else
             {
-                return BadRequest();
+                return View(card);
             }
 
             return RedirectToAction("Card");

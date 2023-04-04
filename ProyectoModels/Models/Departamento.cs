@@ -7,7 +7,7 @@ public partial class Departamento
 {
     public int IdDepartamento { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = null!;
 
     public virtual ICollection<Municipio> Municipios { get; } = new List<Municipio>();
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace ProyectoModels.Models;
 
@@ -24,22 +23,15 @@ public partial class StoreContext : DbContext
 
     public virtual DbSet<Municipio> Municipios { get; set; }
 
+    public virtual DbSet<Product> Products { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-               .SetBasePath(Directory.GetCurrentDirectory())
-               .AddJsonFile("appsettings.json")
-               .Build();
-            var connectionString = configuration.GetConnectionString("conexion");
-            optionsBuilder.UseMySQL(connectionString);
-        }
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySQL("server=127.0.0.1;userid=root;password=root123;database=store;TreatTinyAsBoolean=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,6 +60,7 @@ public partial class StoreContext : DbContext
 
             entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.Cards)
                 .HasForeignKey(d => d.IdUser)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_card_user");
         });
 
@@ -99,10 +92,12 @@ public partial class StoreContext : DbContext
 
             entity.HasOne(d => d.IdMunicipioNavigation).WithMany(p => p.Contacts)
                 .HasForeignKey(d => d.IdMunicipio)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_contacts_municipio");
 
             entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.Contacts)
                 .HasForeignKey(d => d.IdUser)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_contacts_user");
         });
 
@@ -134,7 +129,30 @@ public partial class StoreContext : DbContext
 
             entity.HasOne(d => d.IdDepartamentoNavigation).WithMany(p => p.Municipios)
                 .HasForeignKey(d => d.IdDepartamento)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_municipio_departamento");
+        });
+
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.HasKey(e => e.IdProduct).HasName("PRIMARY");
+
+            entity.ToTable("product");
+
+            entity.Property(e => e.IdProduct).HasColumnName("id_product");
+            entity.Property(e => e.Description)
+                .HasMaxLength(300)
+                .HasColumnName("description");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasColumnName("name");
+            entity.Property(e => e.Photo)
+                .HasMaxLength(500)
+                .HasColumnName("photo");
+            entity.Property(e => e.Price)
+                .HasMaxLength(50)
+                .HasColumnName("price");
+            entity.Property(e => e.Stock).HasColumnName("stock");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -142,6 +160,8 @@ public partial class StoreContext : DbContext
             entity.HasKey(e => e.IdRole).HasName("PRIMARY");
 
             entity.ToTable("roles");
+
+            entity.HasIndex(e => e.Name, "name").IsUnique();
 
             entity.Property(e => e.IdRole).HasColumnName("id_role");
             entity.Property(e => e.Name)
@@ -154,6 +174,8 @@ public partial class StoreContext : DbContext
             entity.HasKey(e => e.IdUser).HasName("PRIMARY");
 
             entity.ToTable("users");
+
+            entity.HasIndex(e => e.Email, "email").IsUnique();
 
             entity.HasIndex(e => e.IdRole, "fk_user_rol");
 

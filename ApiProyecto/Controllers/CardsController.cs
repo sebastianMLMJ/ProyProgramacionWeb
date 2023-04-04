@@ -16,14 +16,14 @@ namespace ApiProyecto.Controllers
         
         // GET: api/Cards
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards()
+        public async Task<ActionResult<IEnumerable<Card>>> GetCards(int id)
         {
             StoreContext _context = new StoreContext();
           if (_context.Cards == null)
           {
               return NotFound();
           }
-            return await _context.Cards.ToListAsync();
+            return await _context.Cards.Where(p => p.IdUser==id).ToListAsync();
         }
 
         // GET: api/Cards/5

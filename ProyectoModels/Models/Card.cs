@@ -7,13 +7,13 @@ public partial class Card
 {
     public int IdCard { get; set; }
 
-    public string? Cardtype { get; set; }
+    public string Cardtype { get; set; } = null!;
 
-    public string? Number { get; set; }
+    public string Number { get; set; } = null!;
 
-    public string? ExpMonth { get; set; }
+    public string ExpMonth { get; set; } = null!;
 
-    public string? ExpYear { get; set; }
+    public string ExpYear { get; set; } = null!;
 
     public int? IdUser { get; set; }
 

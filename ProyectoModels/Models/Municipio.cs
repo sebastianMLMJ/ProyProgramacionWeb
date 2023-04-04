@@ -7,7 +7,7 @@ public partial class Municipio
 {
     public int IdMunicipio { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = null!;
 
     public int? IdDepartamento { get; set; }
 

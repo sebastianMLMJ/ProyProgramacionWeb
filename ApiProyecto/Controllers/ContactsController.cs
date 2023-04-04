@@ -185,17 +185,7 @@ namespace ApiProyecto.Controllers
 
             });
 
-            //foreach (var item in contactInfo.municipios)
-            //{
-            //    if (item.Value == contactInfo.Contact.IdMunicipio.ToString())
-            //    {
-            //        item.Selected = true;
-            //    }
-            //    else
-            //    {
-            //        item.Selected = false;
-            //    }
-            //}
+            
 
 
             return contactInfo;

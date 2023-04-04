@@ -26,15 +26,18 @@ namespace Proyecto.Controllers
             using (var context = new StoreContext())
             {
                 var user = context.Users.Where(x => x.Email == email).FirstOrDefault();
-
-                HttpContext.Session.SetString("iduser", user.IdUser.ToString());
+                
                
                 if (user != null && user.Password == password && user.IdRole == 1)
                 {
+                    HttpContext.Session.SetString("iduser", user.IdUser.ToString());
+
                     return RedirectToAction("AdminHome", "Admin");
                 }
                 else if (user != null && user.Password == password && user.IdRole == 3)
                 {
+                    HttpContext.Session.SetString("iduser", user.IdUser.ToString());
+
                     return RedirectToAction("ClientHome", "Client");
                 }
                 else
