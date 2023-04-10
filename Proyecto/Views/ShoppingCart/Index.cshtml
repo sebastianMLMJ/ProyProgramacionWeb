@@ -1,0 +1,50 @@
+﻿@model IEnumerable<ProyectoModels.Models.Shoppingcart>
+
+@{
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<h1>ShoppingCart</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Producto
+            </th>
+            <th>
+                Precio
+            </th>
+            <th>
+                Foto
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdProductNavigation.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdProductNavigation.Price)
+                </td>
+                <td>
+                    <img src="@item.IdProductNavigation.Photo" width="50" height="50"/>
+                </td>
+                <td>
+                    <a href="Delete/?id=@item.IdShoppingcart">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Total due: Q @ViewBag.total</h3>
+<a asp-controller="OrderHeaders" asp-action="Create" asp-route-id="@ViewBag.total">
+<button class="btn btn-primary">Buy</button>
+</a>

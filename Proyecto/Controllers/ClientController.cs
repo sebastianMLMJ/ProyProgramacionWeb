@@ -12,9 +12,23 @@ namespace Proyecto.Controllers
     {
         public string url = ApiUrl.url;
 
-        public IActionResult ClientHome()
+        [HttpGet]
+        public async Task<IActionResult> ClientHome()
         {
-            return View();
+
+            HttpClient client = new HttpClient();
+            var products = await client.GetFromJsonAsync<IEnumerable<Product>>(url + "api/Client");
+            return View(products);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProduct(int? id)
+        {
+            HttpClient client = new HttpClient();
+            var product = await client.GetFromJsonAsync<Product>(url + "api/Client/"+ id.ToString());
+            ViewBag.user = HttpContext.Session.GetString("iduser");
+
+            return View(product);
         }
         //direcciones
         

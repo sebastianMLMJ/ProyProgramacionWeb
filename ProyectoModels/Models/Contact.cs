@@ -22,4 +22,6 @@ public partial class Contact
     public virtual Municipio? IdMunicipioNavigation { get; set; }
 
     public virtual User? IdUserNavigation { get; set; }
+
+    public virtual ICollection<OrderHeader> OrderHeaders { get; } = new List<OrderHeader>();
 }

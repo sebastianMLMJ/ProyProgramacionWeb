@@ -18,4 +18,6 @@ public partial class Card
     public int? IdUser { get; set; }
 
     public virtual User? IdUserNavigation { get; set; }
+
+    public virtual ICollection<OrderHeader> OrderHeaders { get; } = new List<OrderHeader>();
 }

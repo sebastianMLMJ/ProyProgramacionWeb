@@ -16,4 +16,8 @@ public partial class Product
     public int Stock { get; set; }
 
     public string Photo { get; set; } = null!;
+
+    public virtual ICollection<OrderItem> OrderItems { get; } = new List<OrderItem>();
+
+    public virtual ICollection<Shoppingcart> Shoppingcarts { get; } = new List<Shoppingcart>();
 }

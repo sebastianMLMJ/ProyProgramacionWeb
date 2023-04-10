@@ -66,20 +66,24 @@ namespace Proyecto.Controllers
         public async Task<IActionResult> Create([Bind("IdProduct,Name,Description,Price,Stock,Photo")] Product product, IFormFile foto)
         {
             HttpClient client = new HttpClient();
-
-            if (!Directory.Exists(rutasDeSubida.WebRootPath + "\\Fotos\\"))
+            if (ModelState.IsValid)
             {
+                if (!Directory.Exists(rutasDeSubida.WebRootPath + "\\Fotos\\"))
+                {
                 Directory.CreateDirectory(rutasDeSubida.WebRootPath + "\\Fotos\\");
-            }
-            using (FileStream stream = System.IO.File.Create(rutasDeSubida.WebRootPath + "\\Fotos\\" + foto.FileName))
-            {
+                }
+                using (FileStream stream = System.IO.File.Create(rutasDeSubida.WebRootPath + "\\Fotos\\" + foto.FileName))
+                {
                 foto.CopyTo(stream);
                 stream.Flush();
+                }
+
+                product.Photo =  "/Fotos/" + foto.FileName;
+
+                var response = await client.PostAsJsonAsync(url + "api/Products", product);
+            
+                return RedirectToAction(nameof(Index));
             }
-
-            product.Photo =  "/Fotos/" + foto.FileName;
-
-            var response = await client.PostAsJsonAsync(url + "api/Products", product);
 
             return View(product);
         }

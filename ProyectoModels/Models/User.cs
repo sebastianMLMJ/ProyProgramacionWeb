@@ -18,4 +18,6 @@ public partial class User
     public virtual ICollection<Contact> Contacts { get; } = new List<Contact>();
 
     public virtual Role? IdRoleNavigation { get; set; }
+
+    public virtual ICollection<Shoppingcart> Shoppingcarts { get; } = new List<Shoppingcart>();
 }

@@ -23,9 +23,15 @@ public partial class StoreContext : DbContext
 
     public virtual DbSet<Municipio> Municipios { get; set; }
 
+    public virtual DbSet<OrderHeader> OrderHeaders { get; set; }
+
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<Shoppingcart> Shoppingcarts { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -133,6 +139,65 @@ public partial class StoreContext : DbContext
                 .HasConstraintName("fk_municipio_departamento");
         });
 
+        modelBuilder.Entity<OrderHeader>(entity =>
+        {
+            entity.HasKey(e => e.IdOrder).HasName("PRIMARY");
+
+            entity.ToTable("order_header");
+
+            entity.HasIndex(e => e.IdCard, "fk_order_card");
+
+            entity.HasIndex(e => e.IdContact, "fk_order_contact");
+
+            entity.Property(e => e.IdOrder).HasColumnName("id_order");
+            entity.Property(e => e.IdCard).HasColumnName("id_card");
+            entity.Property(e => e.IdContact).HasColumnName("id_contact");
+            entity.Property(e => e.OrderDate)
+                .HasColumnType("datetime")
+                .HasColumnName("order_date");
+            entity.Property(e => e.OrderStatus)
+                .HasMaxLength(50)
+                .HasColumnName("order_status");
+            entity.Property(e => e.Total)
+                .HasMaxLength(50)
+                .HasColumnName("total");
+
+            entity.HasOne(d => d.IdCardNavigation).WithMany(p => p.OrderHeaders)
+                .HasForeignKey(d => d.IdCard)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_order_card");
+
+            entity.HasOne(d => d.IdContactNavigation).WithMany(p => p.OrderHeaders)
+                .HasForeignKey(d => d.IdContact)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_order_contact");
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.HasKey(e => e.IdOrderItem).HasName("PRIMARY");
+
+            entity.ToTable("order_item");
+
+            entity.HasIndex(e => e.IdOrder, "fk_item_order");
+
+            entity.HasIndex(e => e.IdProduct, "fk_item_product");
+
+            entity.Property(e => e.IdOrderItem).HasColumnName("id_order_item");
+            entity.Property(e => e.IdOrder).HasColumnName("id_order");
+            entity.Property(e => e.IdProduct).HasColumnName("id_product");
+
+            entity.HasOne(d => d.IdOrderNavigation).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.IdOrder)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_item_order");
+
+            entity.HasOne(d => d.IdProductNavigation).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.IdProduct)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_item_product");
+        });
+
         modelBuilder.Entity<Product>(entity =>
         {
             entity.HasKey(e => e.IdProduct).HasName("PRIMARY");
@@ -167,6 +232,31 @@ public partial class StoreContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(30)
                 .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Shoppingcart>(entity =>
+        {
+            entity.HasKey(e => e.IdShoppingcart).HasName("PRIMARY");
+
+            entity.ToTable("shoppingcart");
+
+            entity.HasIndex(e => e.IdProduct, "fk_cart_product");
+
+            entity.HasIndex(e => e.IdUser, "fk_cart_user");
+
+            entity.Property(e => e.IdShoppingcart).HasColumnName("id_shoppingcart");
+            entity.Property(e => e.IdProduct).HasColumnName("id_product");
+            entity.Property(e => e.IdUser).HasColumnName("id_user");
+
+            entity.HasOne(d => d.IdProductNavigation).WithMany(p => p.Shoppingcarts)
+                .HasForeignKey(d => d.IdProduct)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_cart_product");
+
+            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.Shoppingcarts)
+                .HasForeignKey(d => d.IdUser)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_cart_user");
         });
 
         modelBuilder.Entity<User>(entity =>

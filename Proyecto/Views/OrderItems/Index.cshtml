@@ -1,0 +1,38 @@
+﻿@model IEnumerable<ProyectoModels.Models.OrderItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IdProductNavigation.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdProductNavigation.Photo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdProductNavigation.Price)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdProductNavigation.Name)
+            </td>
+            <td>
+                <img src="@item.IdProductNavigation.Photo" width="50" height="50">
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdProductNavigation.Price)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

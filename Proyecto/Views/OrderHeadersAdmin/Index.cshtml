@@ -1,0 +1,72 @@
+﻿@model IEnumerable<ProyectoModels.Models.OrderHeader>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdCardNavigation.Number)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdContactNavigation.HomeAddress)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Total)
+            </td>
+            <td>
+                Number:
+                @Html.DisplayFor(modelItem => item.IdCardNavigation.Number)
+                <br>
+                Exp Month:
+                @Html.DisplayFor(modelItem => item.IdCardNavigation.ExpMonth)
+                <br>
+                Exp Year:
+                @Html.DisplayFor(modelItem => item.IdCardNavigation.ExpYear)
+            </td>
+            <td>
+                Phone:
+                @Html.DisplayFor(modelItem => item.IdContactNavigation.PhoneNumber)
+                <br>
+                Address:
+                @Html.DisplayFor(modelItem => item.IdContactNavigation.HomeAddress)
+                <br>
+                Municipio:
+                @Html.DisplayFor(modelItem => item.IdContactNavigation.IdMunicipioNavigation.Name)
+                <br>
+                Departamento:
+                @Html.DisplayFor(modelItem => item.IdContactNavigation.IdMunicipioNavigation.IdDepartamentoNavigation.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdOrder">Edit</a> |
+                <a asp-controller="OrderItemsAdmin" asp-action="Index" asp-route-id="@item.IdOrder">Items</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
