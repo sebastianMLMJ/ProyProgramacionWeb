@@ -2,13 +2,13 @@
 using ProyectoModels.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using BCrypt;
 
 namespace Proyecto.Controllers
 {
     public class HomeController : Controller
     {
-        
-
+        string url = ApiUrl.url;
         public IActionResult Index()
         {
             return View();
@@ -21,15 +21,20 @@ namespace Proyecto.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string email, string password, bool checkbox)
+        public async Task<IActionResult> Login(string email, string password, bool checkbox)
         {
+            HttpClient client = new HttpClient();
             using (var context = new StoreContext())
             {
-                var user = context.Users.Where(x => x.Email == email).FirstOrDefault();
-                
-               
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+                bool verify = BCrypt.Net.BCrypt.Verify(password, "$2a$11$LDniSkB218VfCZy5vnK5y.CeZMknGgDmH.cRquveVSw61rETnBffG");
+                var user = await client.GetFromJsonAsync<User>(url +"api/Home/" + email);
+                                    
                 if (user != null && user.Password == password && user.IdRole == 1)
                 {
+
+                    HttpContext.Session.SetString("UserType", "Admin");
                     HttpContext.Session.SetString("iduser", user.IdUser.ToString());
 
                     return RedirectToAction("AdminHome", "Admin");
@@ -56,23 +61,24 @@ namespace Proyecto.Controllers
         }
         
         [HttpPost]
-        public IActionResult Register(string email, string password)
+        public async Task<IActionResult> Register(string email, string password)
         {
 
+            HttpClient client = new HttpClient();
 
             using (var context = new StoreContext())
             {
-                var verifyuser = context.Users.Count(x => x.Email == email);
+                var verifyuser = await client.GetFromJsonAsync<int>(url + "api/Home?email=" + email);
                 if (verifyuser <=0) {
-                    context.Users.Add(new User { Email = email, Password = password, IdRole = 3 });
-                    context.SaveChanges();
+                    User user = new User() { Email = email, Password= password, IdRole= 3};
+                    var response = await client.PostAsJsonAsync(url + "api/Home", user);
                 }
                 else
                 {
                     return RedirectToAction("Register",new {message = "That mail was already registered"}) ;
                 }
             }
-            return View();
+            return RedirectToAction(nameof(Login));
         }
 
         public IActionResult Privacy()

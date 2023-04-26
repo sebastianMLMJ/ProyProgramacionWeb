@@ -1,12 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProyectoModels.ViewModels;
 
 namespace Proyecto.Controllers
 {
     public class AdminController : Controller
     {
-        public IActionResult AdminHome()
+        string url = ApiUrl.url;
+        public async Task<IActionResult> AdminHome()
         {
-            return View();
+            HttpClient client= new HttpClient();
+            var kpis = await client.GetFromJsonAsync<Kpis>(url + "api/Admin");
+            return View(kpis);
         }
     }
 }

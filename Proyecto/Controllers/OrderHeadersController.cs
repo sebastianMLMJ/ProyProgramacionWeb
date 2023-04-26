@@ -17,8 +17,10 @@ namespace Proyecto.Controllers
         // GET: OrderHeaders
         public async Task<IActionResult> Index()
         {
-            var storeContext = _context.OrderHeaders.Include(o => o.IdCardNavigation).Include(o => o.IdContactNavigation);
-            return View(await storeContext.ToListAsync());
+            string id = HttpContext.Session.GetString("iduser");
+            HttpClient client = new HttpClient();
+            var orders = await client.GetFromJsonAsync<IEnumerable<OrderHeader>>(url+ "api/OrderHeaders?id=" + id);
+            return View(orders);
         }
 
         // GET: OrderHeaders/Details/5

@@ -36,7 +36,7 @@ namespace Proyecto.Controllers
         public async Task<IActionResult> addresses()
         {
             string? iduser = HttpContext.Session.GetString("iduser");
-            IEnumerable<Contact> list;
+            IEnumerable<Contact>? list;
             try
             {
                 HttpClient client = new HttpClient();

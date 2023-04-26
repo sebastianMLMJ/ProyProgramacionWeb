@@ -84,21 +84,33 @@ namespace ApiProyecto.Controllers
           {
               return Problem("Entity set 'StoreContext.OrderHeaders'  is null.");
           }
+          if (ModelState.IsValid)
+            {
+
+            }
             _context.Database.BeginTransaction();
             try
             {
                 _context.OrderHeaders.Add(orderHeader);
+
                 await _context.SaveChangesAsync();
 
                 var shoppingcart = await _context.Shoppingcarts.Where(p => p.IdUser == id).ToListAsync();
 
                 List<OrderItem> orderItems = new List<OrderItem>();
+                List<Product> orderproducts = new List<Product>();
                 foreach (var item in shoppingcart)
                 {
                     OrderItem newItem = new OrderItem() { IdOrder = orderHeader.IdOrder, IdProduct = item.IdProduct };
+                    Product product = await _context.Products.FirstAsync(p => p.IdProduct== item.IdProduct);
+                    product.Stock = product.Stock - 1;
+                    orderproducts.Add(product);
                     orderItems.Add(newItem);
+
                 }
 
+                _context.Products.UpdateRange(orderproducts);
+                
                 _context.OrderItems.AddRange(orderItems);
 
                 _context.RemoveRange(shoppingcart);
@@ -108,7 +120,7 @@ namespace ApiProyecto.Controllers
                 
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.Database.RollbackTransaction();
             }

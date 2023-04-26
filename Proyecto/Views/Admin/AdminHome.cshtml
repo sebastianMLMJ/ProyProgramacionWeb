@@ -1,8 +1,11 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ProyectoModels.ViewModels.Kpis
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Welcome admin</h2>
+<h1>Welcome admin</h1>
+
+<h1>Ordenes por Confirmar: @Model.PorConfirmar</h1>
+<h1>Ordenes Confirmadas: @Model.Confirmadas</h1>
+<h1>Ordenes Enviadas @Model.Enviadas</h1>
+<h1>Ordenes Entregadas: @Model.Entregadas</h1>
