@@ -11,7 +11,6 @@ namespace Proyecto.Controllers
 {
     public class OrderItemsController : Controller
     {
-        private readonly StoreContext _context = new StoreContext();
 
         string url = ApiUrl.url;
 

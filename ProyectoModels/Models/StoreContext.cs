@@ -164,12 +164,12 @@ public partial class StoreContext : DbContext
 
             entity.HasOne(d => d.IdCardNavigation).WithMany(p => p.OrderHeaders)
                 .HasForeignKey(d => d.IdCard)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_order_card");
 
             entity.HasOne(d => d.IdContactNavigation).WithMany(p => p.OrderHeaders)
                 .HasForeignKey(d => d.IdContact)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_order_contact");
         });
 
@@ -189,12 +189,12 @@ public partial class StoreContext : DbContext
 
             entity.HasOne(d => d.IdOrderNavigation).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.IdOrder)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_item_order");
 
             entity.HasOne(d => d.IdProductNavigation).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.IdProduct)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_item_product");
         });
 
@@ -275,7 +275,7 @@ public partial class StoreContext : DbContext
                 .HasColumnName("email");
             entity.Property(e => e.IdRole).HasColumnName("id_role");
             entity.Property(e => e.Password)
-                .HasMaxLength(50)
+                .HasMaxLength(200)
                 .HasColumnName("password");
 
             entity.HasOne(d => d.IdRoleNavigation).WithMany(p => p.Users)

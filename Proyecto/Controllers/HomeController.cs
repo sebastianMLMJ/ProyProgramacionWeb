@@ -3,6 +3,7 @@ using ProyectoModels.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using BCrypt;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Proyecto.Controllers
 {
@@ -24,34 +25,36 @@ namespace Proyecto.Controllers
         public async Task<IActionResult> Login(string email, string password, bool checkbox)
         {
             HttpClient client = new HttpClient();
-            using (var context = new StoreContext())
+
+            var token = await client.GetFromJsonAsync<Token>(url +"api/Home/" + email + "/" + password);
+            string iduser;
+            string idrole;
+            if (token.token != null)
             {
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+                var readedtoken = new JwtSecurityTokenHandler().ReadJwtToken(token.token);
+                 iduser = readedtoken.Payload["id"].ToString();
+                 idrole = readedtoken.Payload["idRole"].ToString();
 
-                bool verify = BCrypt.Net.BCrypt.Verify(password, "$2a$11$LDniSkB218VfCZy5vnK5y.CeZMknGgDmH.cRquveVSw61rETnBffG");
-                var user = await client.GetFromJsonAsync<User>(url +"api/Home/" + email);
-                                    
-                if (user != null && user.Password == password && user.IdRole == 1)
+                if (idrole == "1")
                 {
-
                     HttpContext.Session.SetString("UserType", "Admin");
-                    HttpContext.Session.SetString("iduser", user.IdUser.ToString());
+                    HttpContext.Session.SetString("iduser", iduser);
 
                     return RedirectToAction("AdminHome", "Admin");
                 }
-                else if (user != null && user.Password == password && user.IdRole == 3)
+                else if (idrole == "3")
                 {
-                    HttpContext.Session.SetString("iduser", user.IdUser.ToString());
-
+                    HttpContext.Session.SetString("iduser", iduser);
                     return RedirectToAction("ClientHome", "Client");
                 }
                 else
                 {
                     return RedirectToAction("Login", new { message = "Incorrect mail or password" });
                 }
+
             }
-            
-            return View();
+
+            return RedirectToAction("Login", new { message = "Incorrect mail or password" });
         }
 
         public IActionResult Register(string? message)
@@ -65,12 +68,12 @@ namespace Proyecto.Controllers
         {
 
             HttpClient client = new HttpClient();
-
+            var encryptedPassword = BCrypt.Net.BCrypt.HashPassword(password);
             using (var context = new StoreContext())
             {
                 var verifyuser = await client.GetFromJsonAsync<int>(url + "api/Home?email=" + email);
                 if (verifyuser <=0) {
-                    User user = new User() { Email = email, Password= password, IdRole= 3};
+                    User user = new User() { Email = email, Password= encryptedPassword, IdRole= 3};
                     var response = await client.PostAsJsonAsync(url + "api/Home", user);
                 }
                 else
@@ -80,16 +83,5 @@ namespace Proyecto.Controllers
             }
             return RedirectToAction(nameof(Login));
         }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
     }
 }

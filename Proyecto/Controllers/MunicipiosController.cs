@@ -27,24 +27,6 @@ namespace Proyecto.Controllers
             return View(municipios);
         }
 
-        // GET: Municipios/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Municipios == null)
-            {
-                return NotFound();
-            }
-
-            var municipio = await _context.Municipios
-                .Include(m => m.IdDepartamentoNavigation)
-                .FirstOrDefaultAsync(m => m.IdMunicipio == id);
-            if (municipio == null)
-            {
-                return NotFound();
-            }
-
-            return View(municipio);
-        }
 
         // GET: Municipios/Create
         public async Task<IActionResult> Create()

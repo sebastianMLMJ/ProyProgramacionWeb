@@ -1,13 +1,13 @@
+drop table order_item;
+drop table order_header;
 DROP TABLE card;
 drop table contact;
-DROP TABLE users;
 drop table municipio;
 drop table departamento;
-drop table roles;
 drop table shoppingcart;
-
-
-select * from product;
+DROP TABLE users;
+drop table roles;
+drop table product;
 
 CREATE TABLE roles (
 id_role int primary key auto_increment,
@@ -17,7 +17,7 @@ name varchar (30) not null unique
 CREATE TABLE users(
 id_user int primary key auto_increment,
 email varchar (50) not null unique,
-password varchar(50) not null,
+password varchar(200) not null,
 id_role int,
 constraint fk_user_rol foreign key (id_role) references roles(id_role)
 );
@@ -62,7 +62,7 @@ name varchar(50) not null,
 description varchar (300) not null,
 price varchar(50) not null,
 stock int not null,
-photo varchar(500) not null
+photo varchar(500) null
 );
 
 CREATE TABLE shoppingcart (
@@ -73,8 +73,6 @@ constraint fk_cart_user foreign key (id_user) references users (id_user) ON DELE
 constraint fk_cart_product foreign key (id_product) references product(id_product) ON DELETE CASCADE
 );
 
-drop table order_item;
-drop table order_header;
 
 CREATE TABLE order_header (
 id_order int primary key auto_increment,
@@ -83,16 +81,16 @@ order_status varchar(50),
 total varchar(50),
 id_card int,
 id_contact int,
-constraint fk_order_card foreign key (id_card) references card (id_card) ON DELETE SET NULL,
-constraint fk_order_contact foreign key (id_contact) references contact (id_contact) ON DELETE SET NULL
+constraint fk_order_card foreign key (id_card) references card (id_card) ON DELETE CASCADE,
+constraint fk_order_contact foreign key (id_contact) references contact (id_contact) ON DELETE CASCADE
 );
 
 CREATE TABLE order_item (
 id_order_item int primary key auto_increment,
 id_product int,
 id_order int,
-constraint fk_item_order foreign key(id_order) references order_header(id_order) ON DELETE SET NULL,
-constraint fk_item_product foreign key (id_product) references product (id_product) ON DELETE SET NULL
+constraint fk_item_order foreign key(id_order) references order_header(id_order) ON DELETE CASCADE,
+constraint fk_item_product foreign key (id_product) references product (id_product) ON DELETE CASCADE
 );
 
 
@@ -100,5 +98,6 @@ insert into roles (name) values ('admin');
 insert into roles (name) values ('user');
 insert into roles (name) values ('client');
 
-insert into users (email, password, id_role) values('adminuser@gmail.com','test123',1);
+insert into users (email, password, id_role) values('adminuser@gmail.com','$2a$11$oBMx.WdW//tkAlLraK/Hs.kzuyhRjCq1h9ncCEADGbpg2Y8CCx6mS',1);
+
 

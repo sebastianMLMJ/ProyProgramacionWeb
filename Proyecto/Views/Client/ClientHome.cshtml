@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_ClientLayout.cshtml";
 }
 
-<h1>Welcome Client</h1>
+<h1 class="text-center"><b>Welcome!</b></h1>
 
 @foreach (var item in Model){
     <a asp-action="GetProduct" asp-route-id="@item.IdProduct">

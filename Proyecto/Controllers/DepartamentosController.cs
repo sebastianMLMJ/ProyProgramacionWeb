@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using ProyectoModels.Models;
 
 namespace Proyecto.Controllers
@@ -23,24 +24,6 @@ namespace Proyecto.Controllers
             return View(departamentos);
         }
 
-        // GET: Departamentoes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            StoreContext _context = new StoreContext();
-            if (id == null || _context.Departamentos == null)
-            {
-                return NotFound();
-            }
-
-            var departamento = await _context.Departamentos
-                .FirstOrDefaultAsync(m => m.IdDepartamento == id);
-            if (departamento == null)
-            {
-                return NotFound();
-            }
-
-            return View(departamento);
-        }
 
         // GET: Departamentoes/Create
         public IActionResult Create()
@@ -83,12 +66,15 @@ namespace Proyecto.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("IdDepartamento,Name")] Departamento departamento)
         {
 
-            HttpClient client = new HttpClient();
+            if (ModelState.IsValid)
+            {
+                HttpClient client = new HttpClient();
+                var response = await client.PutAsJsonAsync(url + "api/Departamentos/" + departamento.IdDepartamento, departamento);
+                return RedirectToAction(nameof(Index));
 
-            var response = await client.PutAsJsonAsync(url+ "api/Departamentos/" + departamento.IdDepartamento,departamento);
+            }
 
-
-            return RedirectToAction(nameof(Index));
+            return View(departamento);
         }
 
         // GET: Departamentoes/Delete/5

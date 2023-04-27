@@ -13,7 +13,6 @@ namespace Proyecto.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly StoreContext _context = new StoreContext();
 
         public static IWebHostEnvironment rutasDeSubida;
 
@@ -34,24 +33,6 @@ namespace Proyecto.Controllers
                           Problem("Entity set 'StoreContext.Products'  is null.");
         }
 
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Products == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.IdProduct == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
         // GET: Products/Create
         public IActionResult Create()
         {
@@ -63,7 +44,7 @@ namespace Proyecto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdProduct,Name,Description,Price,Stock,Photo")] Product product, IFormFile foto)
+        public async Task<IActionResult> Create([Bind("Name,Description,Price,Stock,Photo")] Product product, IFormFile foto)
         {
             HttpClient client = new HttpClient();
             if (ModelState.IsValid)
@@ -170,23 +151,11 @@ namespace Proyecto.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Products == null)
-            {
-                return Problem("Entity set 'StoreContext.Products'  is null.");
-            }
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-            }
-            
-            await _context.SaveChangesAsync();
+            HttpClient client = new HttpClient();
+            var response = await client.DeleteFromJsonAsync<Product>(url + "api/Products/"+id.ToString());
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
-        {
-          return (_context.Products?.Any(e => e.IdProduct == id)).GetValueOrDefault();
-        }
+      
     }
 }

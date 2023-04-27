@@ -11,7 +11,6 @@ namespace Proyecto.Controllers
 {
     public class OrderHeadersAdminController : Controller
     {
-        private readonly StoreContext _context= new StoreContext();
 
         string url = ApiUrl.url;
         // GET: OrderHeadersAdmin
@@ -72,9 +71,6 @@ namespace Proyecto.Controllers
            
             return View(orderHeader);
         }
-        private bool OrderHeaderExists(int id)
-        {
-          return (_context.OrderHeaders?.Any(e => e.IdOrder == id)).GetValueOrDefault();
-        }
+       
     }
 }
